@@ -165,3 +165,143 @@ real router/handlers against one shared in-memory context. They cover every touc
   minimized evidence is persisted (no raw order id/address/price/payment); provisional
   products route to the admin merge/review queues.
 
+## Development instructions
+
+### Prerequisites
+
+- **Node.js 20+**
+- **npm** (uses npm workspaces)
+- **Chrome** for loading the MV3 extension locally
+
+No `.env` file is required for the current local prototype. The web/API prototype is intentionally
+backend-free and uses in-memory repositories seeded at runtime.
+
+### Install dependencies
+
+```bash
+npm install
+```
+
+### Run the web prototype
+
+```bash
+npm run dev:web
+```
+
+Open `http://localhost:5173`. Useful local flows:
+
+- Product Q&A: `http://localhost:5173/products/demo-earbuds-pro`
+- Extension-style deep link: `http://localhost:5173/?asin=B0EARBUDS01&parentAsin=B0EARBUDSP`
+- Admin console: `http://localhost:5173/admin`
+
+The web app runs against `apps/web/src/client/localClient.ts`, which dispatches real API/router
+contracts into an in-memory context. Restarting the dev server resets prototype data.
+
+### Build and load the Chrome extension
+
+```bash
+npm run build:extension
+```
+
+Then load it in Chrome:
+
+1. Open `chrome://extensions`.
+2. Enable **Developer mode**.
+3. Click **Load unpacked**.
+4. Select `apps/extension/dist`.
+
+The extension is scoped to Amazon.com product detail pages and Amazon Orders pages used for
+user-initiated verification. Its API client defaults to `http://localhost:5173/api`, so keep
+`npm run dev:web` running while testing the extension locally.
+
+### Test
+
+```bash
+npm test
+```
+
+This runs all Vitest suites:
+
+- shared-domain unit tests in `packages/shared`
+- web/API and UI tests in `apps/web`
+- extension unit tests in `apps/extension`
+- cross-component integration tests in `tests/integration`
+- deterministic E2E prototype tests in `tests/e2e`
+
+For watch mode:
+
+```bash
+npm run test:watch
+```
+
+### Type-check
+
+```bash
+npm run typecheck
+```
+
+This type-checks every workspace with strict TypeScript settings.
+
+### Build all components
+
+```bash
+npm run build
+```
+
+Outputs:
+
+- Web app build: `apps/web/dist`
+- Extension bundle: `apps/extension/dist`
+
+Both directories are intentionally ignored by Git.
+
+### Smoke-test locally
+
+After `npm run dev:web`, verify the web app responds:
+
+```bash
+curl -I http://localhost:5173
+```
+
+Expected: `HTTP/1.1 200 OK`.
+
+### Deploy the web prototype
+
+The product target remains **Next.js on Vercel + Supabase/Postgres** (see
+[`docs/09-mvp-implementation-spec.md`](docs/09-mvp-implementation-spec.md)). The current prototype is
+Vite/React for local E2E speed, so deploy it as a static Vite app:
+
+1. Create a Vercel project for `apps/web`.
+2. Set the framework preset to **Vite**.
+3. Use:
+   - install command: `npm install`
+   - build command: `npm run build:web`
+   - output directory: `apps/web/dist`
+4. No environment variables are required for the in-memory prototype.
+
+For production, replace the in-memory `RepositoryContext` with a Supabase/Postgres implementation and
+move `apps/web/src/server` handlers into Next.js route handlers before relying on persisted data.
+
+### Package/deploy the extension
+
+For local testing, use `apps/extension/dist` as an unpacked extension. For Chrome Web Store packaging:
+
+```bash
+npm run build:extension
+cd apps/extension
+zip -r owners-app-extension.zip dist
+```
+
+Before any public extension release, complete the privacy/security/legal checks in
+[`docs/07-commerce-privacy-security-and-legal.md`](docs/07-commerce-privacy-security-and-legal.md),
+especially Amazon page permissions, Orders-page verification disclosure, and the no-affiliate-tag
+MVP posture.
+
+### Current MVP limitations
+
+- Data is in-memory and resets between sessions.
+- Amazon Orders verification is implemented as a local prototype flow, not a production-reviewed
+  extension-store release.
+- No affiliate tag is applied in v0.
+- AI/RAG, automated payouts, graph/vector infrastructure, multi-retailer support, and non-Chrome
+  browsers are deferred.
