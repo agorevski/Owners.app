@@ -80,3 +80,44 @@ Early-stage product design with a clarified v0 target. The MVP starts with **Ama
 a **Chrome Manifest V3** extension, **email magic link** accounts, **user-initiated Amazon Orders
 verification**, and a **safe non-affiliate Amazon handoff** while commerce approval is unresolved.
 AI/RAG, automated payouts, graph/vector infrastructure, and multi-retailer support are deferred.
+
+## Prototype implementation (E2E scaffold)
+
+This repo also contains an early **TypeScript prototype workspace** that turns the v0 spec
+([`docs/09-mvp-implementation-spec.md`](docs/09-mvp-implementation-spec.md)) into runnable
+scaffolding. It is intentionally thin — it establishes contracts and structure so multiple
+agents can build in parallel with minimal conflicts.
+
+### Layout
+
+```text
+apps/
+  extension/   Chrome MV3 extension (content scripts, service worker, sidebar)
+  web/         Web app + API prototype shell
+packages/
+  shared/      Domain types, DTO contracts, analytics events, repository abstractions
+docs/          Product/design docs (source of truth)
+```
+
+### Prototype stack note (deviation from docs)
+
+The deployment **target remains Next.js on Vercel + Supabase/Postgres** as specified in the
+docs. For local end-to-end speed and zero external dependencies, the prototype web app uses
+**Vite + React** with **in-memory repository implementations** of the storage-agnostic
+interfaces in `packages/shared`. Swapping to Next.js/Supabase means implementing the same
+`RepositoryContext` against Postgres and moving the handlers in `apps/web/src/server` into
+Next.js route handlers — no domain/contract changes required.
+
+### Commands
+
+```bash
+npm install            # install workspace dependencies
+npm test               # run Vitest unit/integration tests
+npm run typecheck      # type-check every workspace
+npm run build          # build all workspaces
+npm run dev:web        # run the web app shell (Vite) at http://localhost:5173
+npm run build:extension# bundle the Chrome MV3 extension to apps/extension/dist
+```
+
+Load the built extension via `chrome://extensions` → Developer mode → *Load unpacked* →
+`apps/extension/dist`.

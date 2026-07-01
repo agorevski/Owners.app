@@ -1,0 +1,19 @@
+{
+  "name": "@owners/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared domain types, DTO contracts, analytics events, and repository abstractions for Owners.app v0.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./types": "./src/types.ts",
+    "./api": "./src/api.ts",
+    "./events": "./src/events.ts",
+    "./repositories": "./src/repositories.ts",
+    "./product": "./src/product.ts"
+  },
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  }
+}

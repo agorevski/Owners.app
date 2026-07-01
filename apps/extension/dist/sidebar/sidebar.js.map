@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/sidebar/sidebar.ts"],
+  "sourcesContent": ["/**\n * Sidebar/popup UI script.\n *\n * v0 scaffold: shows a calm entry point and a verification start button. UI agents should\n * expand this into the full Q&A + verification surface described in docs/03.\n *\n * TODO(extension-agent): render resolved product Q&A, ask flow, and claim status.\n */\n\nimport type { ExtensionMessage } from \"../lib/messages\";\n\nconst verifyButton = document.getElementById(\"verify\");\nconst status = document.getElementById(\"status\");\n\nverifyButton?.addEventListener(\"click\", () => {\n  const message: ExtensionMessage = { type: \"START_ORDERS_SCAN\" };\n  chrome.runtime.sendMessage(message).then(() => {\n    if (status) {\n      status.textContent = \"Open your Amazon Orders page, then confirm the scan.\";\n    }\n  });\n});\n"],
+  "mappings": ";;;AAWA,MAAM,eAAe,SAAS,eAAe,QAAQ;AACrD,MAAM,SAAS,SAAS,eAAe,QAAQ;AAE/C,gBAAc,iBAAiB,SAAS,MAAM;AAC5C,UAAM,UAA4B,EAAE,MAAM,oBAAoB;AAC9D,WAAO,QAAQ,YAAY,OAAO,EAAE,KAAK,MAAM;AAC7C,UAAI,QAAQ;AACV,eAAO,cAAc;AAAA,MACvB;AAAA,IACF,CAAC;AAAA,EACH,CAAC;",
+  "names": []
+}

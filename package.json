@@ -1,0 +1,28 @@
+{
+  "name": "owners-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Owners.app v0 prototype — Chrome MV3 extension + web app/API + shared domain packages.",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "dev:web": "npm run dev --workspace @owners/web",
+    "build:web": "npm run build --workspace @owners/web",
+    "build:extension": "npm run build --workspace @owners/extension"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Owners.app — Verified Owners",
+  "version": "0.1.0",
+  "description": "Ask a verified owner on Amazon.com earbud product pages. v0 prototype.",
+  "permissions": ["storage", "scripting", "activeTab"],
+  "host_permissions": ["*://*.amazon.com/*"],
+  "action": {
+    "default_title": "Owners.app",
+    "default_popup": "sidebar/sidebar.html"
+  },
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://www.amazon.com/*", "*://smile.amazon.com/*"],
+      "js": ["content/product.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
