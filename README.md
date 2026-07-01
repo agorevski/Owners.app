@@ -68,6 +68,7 @@ the **primary working set**; start here:
 | [`docs/06-ai-and-product-knowledge-graph.md`](docs/06-ai-and-product-knowledge-graph.md) | Product knowledge graph, AI, RAG/search, recommendations, reliability intelligence |
 | [`docs/07-commerce-privacy-security-and-legal.md`](docs/07-commerce-privacy-security-and-legal.md) | Commerce, affiliate/partner risks, privacy, security, legal/compliance |
 | [`docs/08-roadmap-operations-risks-and-backlog.md`](docs/08-roadmap-operations-risks-and-backlog.md) | Roadmap, GTM, operations, risk register, open questions, backlog |
+| [`docs/09-mvp-implementation-spec.md`](docs/09-mvp-implementation-spec.md) | Locked v0 implementation decisions: Amazon.com earbuds, Chrome MV3, verification, stack, deferred systems |
 
 > If it still exists, the original mega seed document remains at
 > [`OWNERS_APP_PRODUCT_DESIGN.md`](OWNERS_APP_PRODUCT_DESIGN.md) for reference, but the
@@ -75,7 +76,7 @@ the **primary working set**; start here:
 
 ## Status
 
-Early-stage product design. What must be true: shoppers will ask at the point of intent;
-enough verified owners will answer for meaningful coverage; ownership can be verified
-cheaply and fraud-resistantly; and at least one compliant monetization path yields
-positive contribution margin per engaged shopper.
+Early-stage product design with a clarified v0 target. The MVP starts with **Amazon.com earbuds**,
+a **Chrome Manifest V3** extension, **email magic link** accounts, **user-initiated Amazon Orders
+verification**, and a **safe non-affiliate Amazon handoff** while commerce approval is unresolved.
+AI/RAG, automated payouts, graph/vector infrastructure, and multi-retailer support are deferred.

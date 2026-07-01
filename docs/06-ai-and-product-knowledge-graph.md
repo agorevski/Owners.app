@@ -12,6 +12,11 @@
 > ownership and reputation weight the evidence AI retrieves, see
 > [Trust, Incentives & Fraud](./05-trust-verification-incentives-and-fraud.md). For where these AI moments
 > appear in real user journeys, see [User Personas & Flows](./01-user-persona-flows.md).
+>
+> **v0 clarification:** the MVP does **not** ship full AI/RAG, embeddings, vector search, or a graph
+> database. It ships Amazon.com earbuds with relational canonical product tables, searchable prior
+> Q&A, and optional human/admin summaries. This document remains the target-state design; see
+> [MVP Implementation Spec](./09-mvp-implementation-spec.md) for the build cut-line.
 
 ---
 

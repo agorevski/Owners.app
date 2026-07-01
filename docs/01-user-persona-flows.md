@@ -16,12 +16,16 @@
 - [06 — AI & Product Knowledge Graph](./06-ai-and-product-knowledge-graph.md) — the AI summary, retrieval, citations, and the graph these flows write to.
 - [07 — Commerce, Privacy, Security & Legal](./07-commerce-privacy-security-and-legal.md) — authoritative rules for the affiliate handoff, disclosures, consent, and data.
 - [08 — Roadmap, Operations, Risks & Backlog](./08-roadmap-operations-risks-and-backlog.md) — sequencing and launch criteria.
+- [09 — MVP Implementation Spec](./09-mvp-implementation-spec.md) — locked v0 build decisions for Amazon.com earbuds, Chrome MV3, verification, and deferred systems.
 
 > **Authority note:** Where this document describes money, identity, data retention, or the
 > affiliate handoff, the authoritative rules live in
 > [07 — Commerce, Privacy, Security & Legal](./07-commerce-privacy-security-and-legal.md) and
 > [05 — Trust, Verification, Incentives & Fraud](./05-trust-verification-incentives-and-fraud.md).
 > If anything here conflicts with those, **those documents win.**
+>
+> **v0 clarification:** the first implementation is Amazon.com earbuds only. Owner rewards are
+> recognition-only, the commerce handoff uses no affiliate tag, and AI answer generation is deferred.
 
 ---
 
@@ -88,7 +92,7 @@ flowchart LR
 | Persona | Motivation | Job to be done | What would make them quit |
 |---|---|---|---|
 | **Helpful Helen** | Intrinsic: enjoys helping; identity as the "go-to" expert. | "Let me share what I know and be recognized for it." | Feeling used, spammed, or unrecognized. |
-| **Reward-Seeking Raj** | Extrinsic: wants to earn from knowledge he already has. | "Let me monetize my real ownership experience fairly." | Opaque/unfair rewards; feeling like a salesperson. |
+| **Recognition-Seeking Raj** | Extrinsic: wants credit now and may want compliant monetization later. | "Let me build trusted status from real ownership experience." | Opaque/unfair rewards; feeling like a salesperson. |
 | **Enthusiast Ellie** | Community/status: hobbyist who lives in the category. | "Connect me with people who care about this as much as I do." | Low-quality questions, toxic interactions. |
 | **Pro/Prosumer Pat** | Professional user with deep, current usage. | "Let my professional experience reach buyers credibly." | Reputation diluted by spam; no differentiation from amateurs. |
 
@@ -121,7 +125,8 @@ it is wrong regardless of how well it converts.
 5. **Disclosure is non-negotiable.** Any monetized link, affiliate relationship, or sponsored
    answer is labeled inline **at the point of interaction**, not buried in a footer.
 6. **Cold start is a feature, not an apology.** Empty states actively recruit the first owners and
-   route questions to the AI assistant with honest "no verified owner yet" framing.
+   surface prior Q&A/admin summaries with honest "no verified owner yet" framing. Future AI surfaces
+   inherit the same rule.
 7. **Accessibility is acceptance criteria.** WCAG 2.2 AA is a gate, not a stretch goal. (Full specs
    in [03 — UX, Extension & Community](./03-ux-extension-and-community.md).)
 
@@ -416,21 +421,15 @@ sequenceDiagram
     participant U as Shopper
     participant X as Extension
     participant D as Disclosure Engine
-    participant A as Attribution Service
-    participant N as Affiliate Network
     participant R as Retailer Checkout
 
     U->>X: Reads verified-owner answers on a product
-    U->>X: Clicks "Buy at Retailer" (explicit action)
-    X->>D: Request disclosure for this retailer/program
-    D-->>X: Render "Affiliate link — we may earn a commission"
+    U->>X: Clicks "Continue to Amazon" (explicit action)
+    X->>D: Request v0 disclosure
+    D-->>X: Render "No affiliate tag in MVP; opens Amazon"
     U->>X: Confirms
-    X->>A: Request tagged deep link (program-approved)
-    A-->>X: Deep link with our affiliate ID + click ref
-    X->>R: Open deep link (new tab / sanctioned context)
-    R-->>N: Conversion event (if purchase)
-    N-->>A: Postback / commission report (async, may be days)
-    A->>A: Reconcile click ref -> conversion -> commission
+    X->>X: Record internal handoff intent event
+    X->>R: Open normal Amazon product page in new tab
 ```
 
 > ⚖️ **Legal nuance — do not cut this corner.** It is tempting to *silently reload the retailer page
@@ -446,10 +445,10 @@ sequenceDiagram
 
 **Design rules the shopper benefits from:**
 
-- The affiliate tag is applied **only** on an explicit user action — never on passive browsing, and
-  never by mutating the retailer's checkout page.
-- We respect **"last click"** and de-duplication — we never overwrite a more-recent legitimate
-  affiliate click we didn't originate.
+- In v0, **no affiliate tag is applied at all**. Future affiliate links require explicit user action,
+  inline disclosure, and program-specific approval.
+- We respect **"last click"** and de-duplication — we never overwrite another legitimate
+  affiliate click.
 - Some programs **ban browser extensions entirely**; for those retailers the shopper simply gets the
   informational, non-affiliate experience. Owner content still lives in *our* chrome, clearly branded
   Owners.app.
@@ -458,8 +457,8 @@ sequenceDiagram
 
 **Acceptance criteria**
 
-- **AC-S5.1** No affiliate tag is applied without an explicit, disclosed user action; passive browsing
-  is never monetized.
+- **AC-S5.1** v0 applies no affiliate tag. Later affiliate tagging remains gated by explicit,
+  disclosed user action and retailer/program approval; passive browsing is never monetized.
 - **AC-S5.2** The affiliate disclosure is shown **before** the user leaves for the retailer, is
   accessible, and the disclosure copy version is logged with the click.
 - **AC-S5.3** Negative or "don't buy" outcomes are fully supported and never down-ranked for
@@ -474,7 +473,7 @@ The platform's hardest problem is the **first owner for any given product**. Emp
 
 | Situation | What the shopper sees | Active behavior |
 |---|---|---|
-| Product matched, **no owners yet** | "No verified owners yet — be the first, or ask and we'll find one." | Offer verification; allow asking → AI answer from docs/specs + queue for future owners |
+| Product matched, **no owners yet** | "No verified owners yet — be the first, or ask and we'll find one." | Offer verification; allow asking → prior Q&A/admin summary if available + queue for future owners |
 | Owners exist, **no answer to this Q** | AI synthesis + "Notify me when an owner answers" | Route to owners async; trigger targeted recruitment |
 | **No product match** | "Help us identify this product" with a prefilled guess | Crowd-assisted identification feeds the graph |
 | **No owners online** | "Owners typically reply in ~Nh" + async post | Honest ETA; async notification |
@@ -484,7 +483,7 @@ flowchart TD
     NM[No owner for product] --> A[Show honest empty state]
     A --> B{User intent?}
     B -- "I own it" --> V[Start verification]
-    B -- "I'm buying" --> Q[AI answer + notify-me]
+    B -- "I'm buying" --> Q[Prior Q&A / admin summary + notify-me]
     Q --> R[Trigger owner recruitment campaign]
     V --> S[First owner seeded -> node activated]
     R --> S
@@ -535,9 +534,10 @@ flowchart TD
 
 ## 4. Persona 2 — The Verified Owner / Contributor
 
-The owner already bought the product. They want to help others, be recognized, and — where it's
-compliant — earn from knowledge they already have, **without becoming a shill**. Every owner-facing
-flow is engineered to be **low-friction to enter** and **fair and legible to stay in**.
+The owner already bought the product. They want to help others, be recognized, and eventually — where
+it's compliant — earn from knowledge they already have, **without becoming a shill**. In v0, the
+reward is recognition only. Every owner-facing flow is engineered to be **low-friction to enter** and
+**fair and legible to stay in**.
 
 ### 4.1 The owner's world in one picture
 
@@ -547,20 +547,21 @@ flowchart LR
     Badge --> Answer[Answer routed questions<br/>live or async]
     Answer --> Longevity[Long-term updates<br/>+ photos over time]
     Answer --> Rep[Reputation<br/>helpful · accurate · longevity]
-    Answer --> Earn[Compliant, delayed reward<br/>with transparent status]
+    Answer --> Earn[Recognition now<br/>future compliant rewards later]
     Longevity --> Rep
     Rep --> Dash[Owner dashboard<br/>one home for it all]
     Earn --> Dash
 ```
 
-The owner dashboard is the **home** that ties verification, inbox, reputation, earnings, and
-longevity prompts into one place. The extension and website share **one identity, one reputation,
-one notification stream**.
+The owner dashboard is the **home** that ties verification, inbox, reputation, recognition, and
+longevity prompts into one place. The extension and website share **one identity, one reputation, one
+notification stream**.
 
 ### 4.2 Flow O1 — Verification & onboarding
 
-**Goal:** let a real owner prove ownership through a method that matches *their* comfort with privacy
-and effort — and start contributing immediately, even before verification fully clears.
+**Goal:** let a real owner prove ownership through an explicit, privacy-minimal Amazon Orders scan
+that they initiate from the Chrome extension — and start contributing immediately once verification
+clears.
 
 ```mermaid
 sequenceDiagram
@@ -569,9 +570,10 @@ sequenceDiagram
     participant Ver as Verification Service
     participant Graph as Knowledge Graph
 
-    Olivia->>Web: "I own this — verify me"
-    Web->>Olivia: Choose proof method (receipt, order link, photo, retailer connect)
-    Olivia->>Ver: Submit proof
+    Olivia->>Web: "I own these earbuds — verify me"
+    Web->>Olivia: Explain Amazon Orders scan and data minimization
+    Olivia->>Web: Opens Amazon Orders and clicks "Scan this page"
+    Web->>Ver: Submit minimal normalized evidence
     Ver->>Ver: Validate + score confidence
     alt High confidence
         Ver-->>Web: Issue "Verified Owner" badge (tiered)
@@ -585,27 +587,28 @@ sequenceDiagram
     end
 ```
 
-**Method chooser** presents a clear privacy/effort tradeoff per method:
+**v0 method** is intentionally narrow:
 
-| Method | Feel | Privacy | Payout-eligible tier |
+| Method | Feel | Privacy | v0 status |
 |---|---|---|---|
-| **Redacted receipt upload** | Manual-ish, private | Redact before upload; stored encrypted, never public | Conditional (V1) |
-| **Order confirmation email / parse** | Fast, consented | Minimize to merchant, item, date, last-4 of order id | Yes (V2) |
-| **Retailer account connect (OAuth)** | Fastest, most data | Clearly labeled scope; refund-aware | Yes (V3) |
-| **Photo of product + serial** | Category-specific | Medium sensitivity | Yes (V4) |
+| **User-initiated Amazon Orders scan** | Fast, explicit | No credentials; store ASIN/parent ASIN, purchase month/year, hashed order id, verification timestamp | Required for v0 verified badge |
+| Redacted receipt upload | Manual fallback | Not shipped unless Orders scan is blocked | Deferred |
+| Order confirmation email parse | Fast but more sensitive | Requires inbox/forwarding design | Deferred |
+| Retailer account connect | Fastest but highest policy/data risk | Requires program/API review | Deferred |
+| Photo of product + serial | Category-specific | Lower purchase confidence for earbuds | Deferred |
 
-**Progressive trust:** owners can start contributing in a **`pending`** state — answers are held or
-labeled until verification clears — which reduces drop-off while protecting shopper trust. A
+**Progressive trust:** owners can draft in a **`pending`** state, but v0 published answers require an
+approved Amazon Orders ownership claim for that canonical earbud product. A
 persistent **verification card** always shows the current tier, what raises it, and expiry /
 re-verification timing. The verification *logic*, confidence scoring, and tier definitions are owned
 by [05 — Trust, Verification, Incentives & Fraud](./05-trust-verification-incentives-and-fraud.md).
 
 **Acceptance criteria**
 
-- **AC-O1.1** At least one **privacy-preserving** proof method exists (e.g. redacted receipt upload)
-  that does **not** require connecting a retailer account.
-- **AC-O1.2** No verification method is mandatory; verification status is always one of `verified`,
-  `pending`, `rejected`, or `expired`, each with a plain-language explanation.
+- **AC-O1.1** The Amazon Orders scan is user-initiated, credential-free, and stores only the minimal
+  normalized evidence listed in [09 — MVP Implementation Spec](./09-mvp-implementation-spec.md).
+- **AC-O1.2** Verification status is always one of `verified`, `pending`,
+  `rejected`, or `expired`, each with a plain-language explanation.
 - **AC-O1.3** Every requested data element shows *why it's needed* and *how long it's retained* at the
   point of request.
 - **AC-O1.4** Proof artifacts are minimized, encrypted, and never shown publicly; only the resulting
@@ -618,8 +621,8 @@ The badge is the owner's credibility, made visible to shoppers, while keeping th
 
 - **Only the tier is public.** Shoppers see "Verified owner · 14mo owned" — never the receipt, email,
   or serial behind it.
-- **Tiered by confidence.** Higher-evidence tiers (email+DKIM, retailer OAuth) carry more weight and
-  unlock payout eligibility; self-declared does not.
+- **Tiered by confidence.** Higher-evidence tiers carry more weight; future payout eligibility remains
+  deferred and policy-gated. In v0, Amazon Orders verification unlocks verified-owner recognition.
 - **Longevity multiplier.** The badge gains a longevity signal as the owner accumulates verified time
   with the product — surfacing "18mo owned" as a first-class trust cue for Longevity Lena.
 - **Category-scoped reputation.** Being a trusted owner of one product doesn't inflate trust in an
@@ -700,37 +703,33 @@ flowchart LR
 
 ### 4.6 Flow O5 — Being rewarded fairly
 
-**Goal:** make earnings **legible and trustworthy**. The owner should always understand *why* they
-earned, *when* it clears, and *what could reverse it* — with no opaque lump sums.
+**Goal:** make recognition **legible and trustworthy** in v0, while preserving a clear target-state
+path to compliant payouts later. The owner should understand what was helpful, why it counted, and
+what payout systems are intentionally not active yet.
 
 ```mermaid
 sequenceDiagram
     actor Sam as Shopper
     actor Olivia as Owner
     participant Plat as Platform
-    participant Aff as Affiliate Partner
-    participant Pay as Payout Service
 
     Olivia->>Plat: Answers question (helpful, attributable)
-    Sam->>Plat: Clicks disclosed product link
-    Plat->>Aff: Tagged referral (compliant)
-    Aff-->>Plat: Conversion confirmed (after return window)
-    Plat->>Plat: Attribute credit to contributing answer(s)
-    Plat-->>Olivia: Pending earning appears with status timeline
-    Plat->>Pay: Release after clearance + compliance checks
-    Pay-->>Olivia: Payout to chosen method
+    Sam->>Plat: Marks answer helpful / asks follow-up
+    Plat->>Plat: Attribute helpfulness to answer
+    Plat-->>Olivia: Reputation + verified-owner recognition updates
+    Plat-->>Olivia: Shows "cash payouts deferred for MVP"
 ```
 
-**The reward philosophy the owner can rely on:**
+**The v0 reward philosophy the owner can rely on:**
 
-- **Pay for helpfulness, never for sentiment.** A negative answer that helps a shopper avoid a bad
-  buy is fully rewardable. The *direction* of the recommendation never affects payment.
-- **Probabilistic and delayed by design.** Earnings are held until the refund/return window closes
-  and vest over time — so fast-churn fraud rarely realizes value, and honest owners aren't penalized.
-- **Legible attribution.** The owner can see exactly which answer contributed ("your answer to Q#123
-  contributed"); when multiple answers contribute, credit-splitting is shown transparently.
-- **No traps.** Reversed conversions (returns/chargebacks) move an earning to `reversed` with a plain
-  explanation; policy avoids negative-balance traps for first-time contributors.
+- **Recognize helpfulness, never sentiment.** A negative answer that helps a shopper avoid a bad buy
+  counts as much as a positive answer.
+- **No cash promises in v0.** The UI must not imply that a purchase generates owner revenue until the
+  affiliate/payout system is legally and programmatically cleared.
+- **Legible contribution credit.** The owner can see which answers were marked helpful and how that
+  affects status/leaderboard placement.
+- **Future payout path is labeled as future.** Target-state payout mechanics remain documented in the
+  trust and commerce docs, but they are not shown as active earnings in v0.
 
 The economics, attribution windows, thresholds, holdbacks, clawbacks, and compliance gates are
 authoritative in
@@ -739,14 +738,13 @@ authoritative in
 
 **Acceptance criteria**
 
-- **AC-O4.1** Every earning shows a status (`pending`, `clearing`, `available`, `paid`, `reversed`)
-  with the reason and the return/clearance window.
-- **AC-O4.2** The exact attribution rationale is viewable; no opaque lump sums. Earnings figures
-  reconcile to per-answer attribution and never show a number the owner can't drill into.
-- **AC-O4.3** Disclosures shown to the shopper are logged and surfaced in the owner's earning detail.
-- **AC-O4.4** Payout requires completed tax/compliance steps; the UI blocks payout with a clear
-  checklist, never silently withholds.
-- **AC-O4.5** Only sufficiently-verified tiers earn; self-declared ownership is ineligible or capped.
+- **AC-O4.1** v0 shows recognition metrics (`helpful`, `answered`, `top helper`) rather than cash
+  earning states.
+- **AC-O4.2** The exact helpfulness rationale is viewable; no opaque scores.
+- **AC-O4.3** The UI never displays pending dollar amounts or payout timelines in v0.
+- **AC-O4.4** Future payout eligibility copy links to the commerce/trust docs and clearly says the
+  system is deferred.
+- **AC-O4.5** Only verified owners can earn verified-owner recognition for a product.
 
 ### 4.7 The owner dashboard & reputation
 
@@ -758,15 +756,15 @@ One home surface ties the whole contributor experience together:
   (category-scoped, decay-aware, anti-positivity controls so genuine critical answers aren't
   penalized). Details in
   [05 — Trust, Verification, Incentives & Fraud](./05-trust-verification-incentives-and-fraud.md).
-- **Earnings** — the status timeline from [Flow O5](#46-flow-o5--being-rewarded-fairly) plus the
-  compliance checklist.
+- **Recognition** — helpfulness, answered questions, top-helper status, and future payout education
+  from [Flow O5](#46-flow-o5--being-rewarded-fairly).
 - **Longevity prompts queue** — from [Flow O4](#45-flow-o4--long-term-updates--photos).
 - **Privacy center** — one-click pause of all activity, plus export/delete.
 
 **Acceptance criteria**
 
-- **AC-O5.1** Earnings figures reconcile to per-answer attribution and never display a number the
-  owner can't drill into.
+- **AC-O5.1** v0 dashboard shows recognition metrics, not dollar earnings; any future payout copy is
+  clearly labeled as deferred.
 - **AC-O5.2** The availability toggle instantly affects routing and presence.
 - **AC-O5.3** The dashboard exposes a one-click path to pause all activity and to export/delete data.
 
@@ -845,8 +843,8 @@ These cross-cutting gates apply to **both** personas and every surface:
 | Identity | Same physical owner, multiple accounts | Linked via verification; reputation not double-counted |
 | Chat | Owner goes offline mid-thread | Converts to async; shopper notified; no message loss |
 | Ask | Question contains PII (serial, address, order id) | Inline warning + optional redaction before posting |
-| Payouts | Conversion reversed post-payout | Status `reversed`, transparent explanation; policy-bound recovery |
-| Research | Conflicting owner answers | Assistant surfaces disagreement honestly, with both citations |
+| Future payouts | Conversion reversed post-payout | Deferred for v0; later UI must show `reversed` with transparent explanation |
+| Research | Conflicting owner answers | UI surfaces disagreement honestly; future AI must preserve both citations |
 | Commerce | Program bans extensions | Retailer gets the informational, non-affiliate experience |
 | i18n | Translated answer changes meaning | Original one tap away; "translated" label persistent |
 | Privacy | User revokes mid-session | In-flight context purged; UI returns to dormant |
@@ -857,8 +855,8 @@ These cross-cutting gates apply to **both** personas and every surface:
 A quick reference distilled from every flow above:
 
 1. **Invisible until valuable, deep on demand.** Silence beats noise; the badge earns the click.
-2. **Never block the user.** AI answers instantly from owner content; the human path is always
-   available, never mandatory.
+2. **Never block the user.** Prior verified-owner content appears instantly when available; the human
+   path is always available, never mandatory. Future AI must remain grounded in owner content.
 3. **Minimum identity, maximum trust.** Ask for the least data that prevents spam, and explain every
    field's purpose and retention at the point of request.
 4. **Provenance is the product.** Owner vs community vs brand vs AI is always obvious, with a

@@ -31,11 +31,18 @@ privacy, and architectural machinery that make those flows safe.
   [AI & Knowledge Graph](./06-ai-and-product-knowledge-graph.md). This document specifies *what*
   the models must optimize for (helpfulness, sentiment neutrality, fraud detection); that
   document specifies *how*.
+- **Locked MVP implementation decisions** live in
+  [MVP Implementation Spec](./09-mvp-implementation-spec.md). For v0, this document's broader tier
+  model is narrowed to Amazon.com earbuds and a user-initiated Amazon Orders scan.
 
 > **North-star rule for everything below:** *Reward helpfulness and accuracy, never
 > positivity.* A blunt "don't buy this — it fails after six months" that saves a shopper
 > money is worth **more** than a glowing upsell. Sentiment polarity is never an input to
 > any trust, scoring, or payout function.
+>
+> **v0 clarification:** verified owners earn recognition only. Cash payouts, wallets, KYC/tax,
+> affiliate-funded reward pools, and advanced verification tiers are deferred until commerce approval
+> and legal review are complete.
 
 ### Trust & integrity at a glance
 
@@ -68,6 +75,12 @@ mindmap
 ## Ownership Verification
 
 ### Goals, Principles & Threat Posture
+
+> **MVP cut-line:** the first implementation verifies **Amazon.com earbud ownership** via an explicit
+> Chrome-extension-assisted Amazon Orders scan. The extension must not collect Amazon credentials and
+> stores only ASIN/parent ASIN, purchase month/year, hashed order id, and verification timestamp.
+> Receipt upload, email parsing, merchant OAuth, serial/warranty proof, and automated payouts are
+> target-state options, not v0 requirements.
 
 #### Design goals
 

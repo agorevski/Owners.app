@@ -19,7 +19,12 @@
 - [06 — AI, Search & Knowledge Graph](./06-ai-and-product-knowledge-graph.md) — AI synthesis, product resolution, knowledge graph.
 - [07 — Commerce, Privacy & Legal](./07-commerce-privacy-security-and-legal.md) — affiliate/payout mechanics, consent, retention, legal backing.
 - [08 — Roadmap & Operations](./08-roadmap-operations-risks-and-backlog.md) — sequencing and operational readiness.
+- [09 — MVP Implementation Spec](./09-mvp-implementation-spec.md) — locked v0 decisions for Amazon.com earbuds, Chrome MV3, verification, stack, and deferred systems.
 
+> **v0 clarification:** the first build targets **Amazon.com earbuds** with a **Chrome Manifest V3**
+> extension. AI, automated payouts, and live affiliate monetization are deferred; the default buy
+> handoff is a disclosed normal Amazon link with no affiliate tag.
+>
 > **Authority note.** Where UX claims touch money, identity, or data retention, the
 > authoritative rules live in [07 — Commerce, Privacy & Legal](./07-commerce-privacy-security-and-legal.md)
 > and [05 — Trust, Incentives & Fraud](./05-trust-verification-incentives-and-fraud.md). If this document
@@ -71,8 +76,8 @@ These principles govern every screen decision in this document.
    sponsored answer is labeled inline at the point of interaction
    (see [07 — Commerce, Privacy & Legal](./07-commerce-privacy-security-and-legal.md)).
 6. **Cold start is a feature, not an apology.** Empty states actively recruit the first
-   owners and route questions to the AI assistant with honest "no verified owner yet"
-   framing.
+   owners and surface prior Q&A honestly. In v0, AI is stubbed/deferred; later AI surfaces must use
+   honest "no verified owner yet" framing when owner evidence is absent.
 7. **Accessibility is acceptance criteria.** WCAG 2.2 AA is a gate, not a stretch goal.
 
 ---
@@ -85,9 +90,9 @@ Journeys are summarized here; the **full step-by-step flows (A–F)** live in
 | Persona | Primary JTBD | Key surface | Success signal |
 | --- | --- | --- | --- |
 | **Shopper "Sam"** | "Before I buy, get a real answer from someone who owns this." | Extension sidebar on retailer PDP | Asks a question, receives a trusted answer, buys (or skips) with confidence |
-| **Verified Owner "Olivia"** | "Help others and earn a share when my knowledge drives a purchase." | Owner dashboard + chat | Answers questions, earns reputation, receives compliant payout |
+| **Verified Owner "Olivia"** | "Help others and get recognized for accurate, useful ownership knowledge." | Owner dashboard + Q&A inbox | Answers questions, earns verified-owner status and helpfulness reputation |
 | **Long-term Owner "Leo"** | "Share how this product held up after 18 months." | Ownership updates / review prompts | Posts a durability update surfaced on the PDP |
-| **Researcher "Riya"** | "Compare 3 options across real ownership experience." | AI Research Assistant | Gets a synthesized, cited comparison grounded in owner answers |
+| **Researcher "Riya"** | "Compare 3 options across real ownership experience." | Search / future AI Research Assistant | Gets prior verified-owner Q&A now; later gets synthesized, cited comparisons |
 | **Moderator "Mara"** | "Keep answers honest, on-topic, and safe." | Moderation surfaces | Resolves flags quickly with full context |
 | **Brand rep "Bram"** (optional) | "Officially answer and correct misinformation." | Verified brand seat | Posts labeled official answers |
 
@@ -494,14 +499,14 @@ flowchart LR
 - **Inbox / routed questions** with availability toggle and canned-but-editable starters.
 - **Reputation** breakdown (helpfulness, accuracy, longevity contributions)
   (see [05 — Trust, Incentives & Fraud](./05-trust-verification-incentives-and-fraud.md)).
-- **Earnings** with the payout status timeline (Journey E) and compliance checklist
-  (see [07 — Commerce, Privacy & Legal](./07-commerce-privacy-security-and-legal.md)).
+- **Recognition** with helpfulness, answered questions, top-helper status, and clearly labeled future
+  payout education (see [07 — Commerce, Privacy & Legal](./07-commerce-privacy-security-and-legal.md)).
 - **Longevity prompts** queue (Journey D).
 
 **Acceptance criteria**
 
-- **AC-DB1:** Earnings figures reconcile to per-answer attribution and never display a
-  number the owner can't drill into.
+- **AC-DB1:** v0 shows recognition metrics, not dollar earnings; future payout copy is clearly
+  labeled as deferred.
 - **AC-DB2:** Availability toggle instantly affects routing and presence.
 - **AC-DB3:** Both dashboards expose a one-click path to pause all activity and to
   export/delete data.
@@ -621,7 +626,7 @@ flowchart TD
     NM[No owner for product] --> A[Show honest empty state]
     A --> B{User intent?}
     B -- "I own it" --> V[Start verification]
-    B -- "I'm buying" --> Q[AI answer + notify-me]
+    B -- "I'm buying" --> Q[Prior Q&A / admin summary + notify-me]
     Q --> R[Trigger owner recruitment campaign]
     V --> S[First owner seeded -> node activated]
     R --> S

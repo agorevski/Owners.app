@@ -20,6 +20,7 @@
 - **Trust, Verification & Incentives:** [`05-trust-verification-incentives-and-fraud.md`](./05-trust-verification-incentives-and-fraud.md) — reputation, incentive rules, anti-gaming, moderation.
 - **Architecture, Data & APIs:** [`04-architecture-data-and-apis.md`](./04-architecture-data-and-apis.md) — canonical schema, services, security boundaries.
 - **AI & Knowledge Graph:** [`06-ai-and-product-knowledge-graph.md`](./06-ai-and-product-knowledge-graph.md) — the compounding knowledge asset and AI-content labeling.
+- **MVP Implementation Spec:** [`09-mvp-implementation-spec.md`](./09-mvp-implementation-spec.md) — locked safe v0 decisions and deferred commerce systems.
 
 ## Table of Contents
 
@@ -76,6 +77,12 @@ Commerce is a monetization surface bolted to that asset, not the asset itself.
 | P4 | **Data minimization by default** | We collect the least data that makes a verified answer trustworthy. Receipts and PII are liabilities, not assets. |
 | P5 | **Trust is the moat; never trade it for a commission** | Any feature that improves short-term revenue at the cost of user/partner/retailer trust is rejected. |
 | P6 | **Separable money paths** | Revenue-in (affiliate) and money-out (payouts) are decoupled ledgers so a problem in one cannot corrupt the other. |
+
+> **v0 commerce clarification:** the first MVP uses **no affiliate tag**, no link replacement, no
+> Amazon page reload for attribution, no cashback, and no automated contributor payouts. It may show
+> a disclosed **Continue to Amazon** handoff that opens the normal Amazon.com product page and records
+> an internal intent event. Affiliate monetization moves behind program-specific approval and legal
+> review. See [MVP Implementation Spec](./09-mvp-implementation-spec.md).
 
 ### Where commerce sits in the system
 
@@ -221,8 +228,8 @@ sequenceDiagram
 
 **Key design rules**
 
-- The affiliate tag is applied **only** on explicit user action, never on passive
-  browsing, and never by mutating the retailer's checkout page.
+- After v0, any affiliate tag is applied **only** on explicit user action, never on passive
+  browsing, and never by mutating the retailer's checkout page. v0 applies no affiliate tag.
 - Each program's **link format, cookie/attribution window, and allowed contexts**
   are encoded as adapter config, not hardcoded assumptions.
 - We respect "**last click**" and **de-duplication** rules — we do not overwrite a
@@ -904,8 +911,9 @@ Disclosures are productized, not an afterthought.
 Hand these to roadmap / open-questions tracking (see
 [`08-roadmap-operations-risks-and-backlog.md`](./08-roadmap-operations-risks-and-backlog.md)):
 
-1. Which affiliate programs/retailers are in scope for Phase 1, and which permit
-   extension behavior at all? (Needs the Program Terms Register populated.)
+1. Which affiliate programs/retailers are in scope after v0, and which permit
+   extension behavior at all? **v0 is resolved as Amazon.com with no affiliate tag**; monetization
+   still needs the Program Terms Register populated before activation.
 2. Build vs. buy for KYC/tax/sanctions and for payout PSP — confirm vendor and
    supported payout geographies.
 3. Cashback (Approach D) and post-purchase attribution (Approach E): legal/program

@@ -19,10 +19,15 @@ Platform**. It covers:
 - The migration path from an MVP modular monolith to modular services
 - Architecture acceptance criteria
 
-The design is intentionally **stack-adaptable**: concrete technologies (PostgreSQL, Redis, Kafka,
-Neo4j/Neptune, OpenSearch, pgvector/Pinecone, Kubernetes) are named as *reference implementations* to
-make the design concrete, not as hard requirements. Swapping any one component should be a local
-decision, not an architectural rewrite.
+The target design is intentionally **stack-adaptable**: concrete technologies (PostgreSQL, Redis,
+Kafka, Neo4j/Neptune, OpenSearch, pgvector/Pinecone, Kubernetes) are named as *reference
+implementations* to make the design concrete, not as hard requirements. Swapping any one component
+should be a local decision, not an architectural rewrite.
+
+> **Current v0 stack decision:** the MVP implementation is **TypeScript full-stack**:
+> Chrome Manifest V3 extension, Next.js web app/API, PostgreSQL, Vercel, and Supabase Auth/storage
+> where useful. The full graph/vector/AI architecture remains target-state; v0 uses a relational
+> schema first. See [MVP Implementation Spec](09-mvp-implementation-spec.md).
 
 > **Non-goal:** This document does **not** define privacy, consent, or legal/compliance policy in
 > depth. It only describes the *architectural boundaries* that make those policies enforceable. For
@@ -39,6 +44,7 @@ decision, not an architectural rewrite.
 | Product knowledge graph, AI layer, RAG, search | [AI & Product Knowledge Graph](06-ai-and-product-knowledge-graph.md) |
 | Commerce, affiliate compliance, privacy, security, legal | [Commerce, Privacy, Security & Legal](07-commerce-privacy-security-and-legal.md) |
 | Roadmap, operations runbooks, risks, backlog | [Roadmap, Operations, Risks & Backlog](08-roadmap-operations-risks-and-backlog.md) |
+| Locked v0 build decisions | [MVP Implementation Spec](09-mvp-implementation-spec.md) |
 
 ---
 

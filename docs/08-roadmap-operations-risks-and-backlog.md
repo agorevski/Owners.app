@@ -15,6 +15,7 @@
 - **Trust, verification, incentives & fraud** (reputation, moderation, payouts policy): [`05`][trust]
 - **AI search & product knowledge graph**: [`06`][ai]
 - **Commerce, privacy, security & legal** (affiliate, payouts, disclosures, DSR): [`07`][commerce]
+- **MVP implementation spec** (locked v0 build decisions): [`09`][mvp]
 
 ---
 
@@ -113,23 +114,24 @@ flowchart TD
 
 **In scope (v0/v1):**
 
-- Single category wedge (see [Category wedge selection](#category-wedge-selection)).
-- Shopper ask flow via browser extension + lightweight web widget ([UX & extension][ux]).
+- Single category wedge: **Amazon.com earbuds** in the United States (see [MVP implementation spec][mvp]).
+- Shopper ask flow via **Chrome Manifest V3** extension + lightweight web widget ([UX & extension][ux]).
 - Owner answer flow (web + email/push notification).
-- One or two ownership verification methods ([trust doc][trust]).
+- MVP ownership verification via explicit, user-initiated Amazon Orders page scan with no Amazon credential collection ([trust doc][trust], [MVP spec][mvp]).
 - Basic Q&A threading, upvotes, and "this helped" signal.
-- Manual moderation queue (human-in-the-loop).
+- Manual moderation queue, user reporting, and rate limits.
 - Core analytics events (see [Event taxonomy](#event-taxonomy)).
-- Affiliate link attachment on retailer products (disclosed) ([commerce doc][commerce]).
+- Disclosed normal Amazon handoff/link with **no affiliate tag** while Amazon program approval is unresolved ([commerce doc][commerce]).
 
 **Explicitly out of scope (deferred):**
 
 - Automated cash payouts and contributor wallets (manual, off-platform rewards in MVP).
-- Full knowledge graph + AI retrieval (stubbed; manual surfacing of prior answers).
+- Full knowledge graph + AI retrieval (stubbed; searchable prior Q&A and human/admin summaries only).
 - Multi-category breadth.
 - Brand/manufacturer dashboards.
 - Mobile native apps (PWA only).
 - Reputation/leveling systems beyond a basic verified badge.
+- Non-US Amazon marketplaces and non-Chrome browsers.
 
 ### MVP acceptance criteria
 
@@ -675,17 +677,17 @@ quadrantChart
 
 | # | Open question | Phase needed | Owner | Default / leaning |
 |---|---------------|--------------|-------|-------------------|
-| Q1 | Which **single category** is the launch wedge? | v0 | Growth | Highest score in [Category wedge selection](#category-wedge-selection) |
-| Q2 | **Recognition-only vs. cash** rewards at launch? | v0 | Product | Recognition first; cash v2 |
-| Q3 | Minimum-viable **verification method(s)** for MVP? | v0 | Trust | Receipt + photo-token |
-| Q4 | **Anonymity model** for owners (handle vs. real name)? | v1 | Policy | Pseudonymous + verified badge |
+| Q1 | Which **single category** is the launch wedge? | v0 | Growth | **Resolved:** Amazon.com earbuds / US |
+| Q2 | **Recognition-only vs. cash** rewards at launch? | v0 | Product | **Resolved:** recognition only; cash deferred |
+| Q3 | Minimum-viable **verification method(s)** for MVP? | v0 | Trust | **Resolved:** user-initiated Amazon Orders scan; no credentials stored |
+| Q4 | **Anonymity model** for owners (handle vs. real name)? | v1 | Policy | **Resolved for v0:** pseudonymous handle + verified badge |
 | Q5 | How are **conflicts of interest / sponsorship** disclosed without eroding trust? | v1 | Legal/Policy | Explicit labels; no answer editing |
 | Q6 | **Payout funding rule** — only realized affiliate revenue, or subsidized to bootstrap? | v2 | Finance | Realized revenue only |
 | Q7 | **KYC threshold** and tax handling jurisdictions? | v2 | Finance/Legal | KYC above payout threshold; 1099/W-8 |
 | Q8 | **Graph ownership & data rights** — who owns contributed Q&A; licensing to partners? | v2/v3 | Legal | Platform license; contributor attribution |
 | Q9 | **Brand dashboard** boundaries — what insights are sellable vs. privacy-sensitive? | v3 | Legal/Product | Aggregated, anonymized only |
 | Q10 | **Safety-critical categories** — do we allow them, with what guardrails? | v1 | Legal | Allow with disclaimers + expert review |
-| Q11 | **Extension vs. embed vs. PWA** primary surface long-term? | v1/v3 | Product | Extension now; embeds at v3 |
+| Q11 | **Extension vs. embed vs. PWA** primary surface long-term? | v1/v3 | Product | **Resolved for v0:** Chrome MV3 extension; embeds later |
 | Q12 | **Moderation: in-house vs. outsourced** as volume scales? | v2 | Ops | Hybrid: automation + in-house core |
 | Q13 | **Pricing model** for partners (rev-share, SaaS, hybrid)? | v3 | BizDev | Hybrid |
 | Q14 | How do we prevent **AI-generated fake "owner" answers**? | v1+ | Trust | Verification + behavioral signals |
@@ -831,4 +833,5 @@ flowchart TD
 [trust]: ./05-trust-verification-incentives-and-fraud.md
 [ai]: ./06-ai-and-product-knowledge-graph.md
 [commerce]: ./07-commerce-privacy-security-and-legal.md
+[mvp]: ./09-mvp-implementation-spec.md
 [architecture]: ./04-architecture-data-and-apis.md

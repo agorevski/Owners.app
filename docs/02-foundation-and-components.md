@@ -23,6 +23,7 @@ assumptions, and the canonical glossary. Everything else is delegated:
 | [06 — AI & Product Knowledge Graph](./06-ai-and-product-knowledge-graph.md) | Product knowledge graph, AI layer, RAG, semantic search, reliability intelligence, evaluation. | You need the **AI** and knowledge-graph design. |
 | [07 — Commerce, Privacy, Security & Legal](./07-commerce-privacy-security-and-legal.md) | Commerce layer, affiliate/attribution, revenue, privacy, security, legal, compliance, disclosures. | You need the **commerce/legal** and privacy posture. |
 | [08 — Roadmap, Operations, Risks & Backlog](./08-roadmap-operations-risks-and-backlog.md) | Roadmap, go-to-market, operations, risk register, open questions, implementation backlog, launch criteria. | You need the **roadmap** and delivery plan. |
+| [09 — MVP Implementation Spec](./09-mvp-implementation-spec.md) | Locked v0 decisions for Amazon.com earbuds, Chrome MV3, verification, stack, safe commerce, and deferred systems. | You need the exact **build cut-line** before implementation. |
 
 > **Cross-reference convention:** links in this document point to the *owning* sibling document.
 > Where a topic (e.g., verification thresholds, attribution windows, SLOs) is only summarized here,
