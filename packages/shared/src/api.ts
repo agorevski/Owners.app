@@ -9,12 +9,11 @@
 import type {
   Answer,
   CanonicalProduct,
+  MinimalOwnershipEvidence,
   OwnershipClaim,
   OwnershipClaimStatus,
   Question,
   ReportTargetType,
-  VerificationMethod,
-  YearMonth,
 } from "./types";
 
 /** Standard machine-readable error envelope. */
@@ -71,17 +70,7 @@ export interface CreateAnswerRequest {
 export type CreateAnswerResponse = Answer;
 
 // POST /api/ownership/claims
-export interface SubmitOwnershipEvidenceRequest {
-  retailer: "amazon";
-  marketplace: "US";
-  asin: string;
-  parentAsin?: string;
-  purchaseMonth?: YearMonth;
-  hashedOrderId?: string;
-  verificationMethod: VerificationMethod;
-  capturedAt: string;
-  extensionVersion: string;
-}
+export type SubmitOwnershipEvidenceRequest = MinimalOwnershipEvidence;
 export interface SubmitOwnershipEvidenceResponse {
   claimId: string;
   status: OwnershipClaimStatus;

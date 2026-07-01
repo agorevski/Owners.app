@@ -137,3 +137,48 @@ export interface AdminAction {
   reason?: string;
   createdAt: ISODateTime;
 }
+
+/**
+ * Minimal normalized ownership evidence captured by the user-initiated Amazon Orders scan.
+ *
+ * This is the ONLY evidence shape stored in v0. It intentionally excludes full order id,
+ * price, shipping address, payment method, and screenshots (see docs/09 section 3 —
+ * "Evidence stored"). The API DTO `SubmitOwnershipEvidenceRequest` is an alias of this type.
+ */
+export interface MinimalOwnershipEvidence {
+  retailer: Retailer;
+  marketplace: Marketplace;
+  asin: string;
+  parentAsin?: string;
+  /** Longevity signal without exact-date exposure. */
+  purchaseMonth?: YearMonth;
+  /** Hashed order id ("sha256:...") for duplicate/fraud detection; raw id never stored. */
+  hashedOrderId?: string;
+  verificationMethod: VerificationMethod;
+  capturedAt: ISODateTime;
+  extensionVersion: string;
+}
+
+/**
+ * Explicit v0 (MVP) constraints, kept in code so callers can assert the cut-line.
+ * Source of truth: docs/09-mvp-implementation-spec.md section 1 ("Locked MVP decisions").
+ */
+export const V0_CONSTRAINTS = {
+  marketplace: "US",
+  retailer: "amazon",
+  category: "earbuds",
+  browser: "chrome-mv3",
+  /** No affiliate tag in v0 — disclosed normal Amazon handoff only. */
+  affiliateTag: null,
+  verificationMethod: "amazon_orders_user_initiated_scan",
+  /** Systems intentionally deferred out of v0 scope. */
+  deferred: [
+    "ai-answer-generation",
+    "rag-vector-search",
+    "graph-database",
+    "contributor-payouts",
+    "multi-retailer",
+    "non-us-marketplace",
+    "non-earbud-categories",
+  ],
+} as const;

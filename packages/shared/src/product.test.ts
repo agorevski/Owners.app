@@ -4,6 +4,8 @@ import {
   isProvisionalResolution,
   isValidAsin,
   normalizeAsin,
+  RESOLUTION_CONFIDENCE,
+  resolveAmazonProduct,
 } from "./product";
 
 describe("product resolution helpers", () => {
@@ -30,5 +32,24 @@ describe("product resolution helpers", () => {
   it("flags provisional resolution when parent data is missing", () => {
     expect(isProvisionalResolution()).toBe(true);
     expect(isProvisionalResolution("B0PARENT01")).toBe(false);
+  });
+});
+
+describe("resolveAmazonProduct", () => {
+  it("groups under the parent ASIN with high confidence when available", () => {
+    const result = resolveAmazonProduct("b0child001", " b0parent01 ");
+    expect(result.provisional).toBe(false);
+    expect(result.canonicalKey).toBe("B0PARENT01");
+    expect(result.parentAsin).toBe("B0PARENT01");
+    expect(result.asin).toBe("B0CHILD001");
+    expect(result.confidence).toBe(RESOLUTION_CONFIDENCE.canonical);
+  });
+
+  it("creates a provisional exact-ASIN resolution when no valid parent exists", () => {
+    const result = resolveAmazonProduct("B0CHILD001", "bad");
+    expect(result.provisional).toBe(true);
+    expect(result.canonicalKey).toBe("B0CHILD001");
+    expect(result.parentAsin).toBeUndefined();
+    expect(result.confidence).toBe(RESOLUTION_CONFIDENCE.provisional);
   });
 });

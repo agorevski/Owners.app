@@ -34,3 +34,41 @@ export function canonicalGroupingKey(asin: string, parentAsin?: string): string 
 export function isProvisionalResolution(parentAsin?: string): boolean {
   return !parentAsin || !isValidAsin(normalizeAsin(parentAsin));
 }
+
+/** v0 supports a single product category. */
+export const V0_PRODUCT_CATEGORY = "earbuds" as const;
+
+/** Resolution confidence heuristic: parent-grouped products are more trustworthy. */
+export const RESOLUTION_CONFIDENCE = {
+  canonical: 0.9,
+  provisional: 0.5,
+} as const;
+
+/** Pure outcome of resolving an Amazon ASIN (+ optional parent) into a canonical grouping. */
+export interface ProductResolution {
+  asin: string;
+  parentAsin?: string;
+  /** Key used to cluster variants; parent ASIN when available, else the exact ASIN. */
+  canonicalKey: string;
+  provisional: boolean;
+  confidence: number;
+}
+
+/**
+ * Resolve an Amazon ASIN (with optional parent/variation ASIN) into a canonical grouping
+ * decision. Storage-agnostic: callers use `canonicalKey` to look up or create the
+ * `canonical_products` row, and `provisional` to route to the admin merge queue.
+ */
+export function resolveAmazonProduct(asin: string, parentAsin?: string): ProductResolution {
+  const normalizedAsin = normalizeAsin(asin);
+  const hasValidParent = !!parentAsin && isValidAsin(normalizeAsin(parentAsin));
+  const provisional = !hasValidParent;
+  return {
+    asin: normalizedAsin,
+    ...(hasValidParent ? { parentAsin: normalizeAsin(parentAsin as string) } : {}),
+    canonicalKey: canonicalGroupingKey(normalizedAsin, parentAsin),
+    provisional,
+    confidence: provisional ? RESOLUTION_CONFIDENCE.provisional : RESOLUTION_CONFIDENCE.canonical,
+  };
+}
+

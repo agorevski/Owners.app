@@ -5,35 +5,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Owners.app</title>
     <style>
+      :root { color-scheme: light; }
       body {
         font-family: system-ui, sans-serif;
-        width: 320px;
+        width: 340px;
         margin: 0;
         padding: 16px;
+        color: #111;
       }
-      h1 {
-        font-size: 16px;
-        margin: 0 0 8px;
-      }
-      p {
-        color: #555;
-        font-size: 13px;
-      }
+      h1 { font-size: 16px; margin: 0 0 4px; }
+      h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: #666; margin: 16px 0 6px; }
+      p { color: #444; font-size: 13px; line-height: 1.4; }
+      .muted { color: #777; font-size: 12px; }
+      .badge { display: inline-block; font-size: 11px; background: #e6f4ea; color: #137333; border-radius: 999px; padding: 2px 8px; }
       button {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid #111;
-        border-radius: 6px;
-        background: #111;
-        color: #fff;
-        cursor: pointer;
+        width: 100%; padding: 9px; margin-top: 8px; border: 1px solid #111; border-radius: 6px;
+        background: #111; color: #fff; cursor: pointer; font-size: 13px;
       }
+      button.secondary { background: #fff; color: #111; }
+      textarea { width: 100%; box-sizing: border-box; min-height: 60px; font: inherit; padding: 6px; }
+      .qa { border-top: 1px solid #eee; padding: 8px 0; }
+      .disclosure { margin-top: 16px; border-top: 1px solid #eee; padding-top: 8px; }
+      ul { padding-left: 18px; margin: 4px 0; }
+      .hidden { display: none; }
+      .evidence { font-family: ui-monospace, monospace; font-size: 11px; background: #f6f6f6; border-radius: 6px; padding: 8px; white-space: pre-wrap; }
     </style>
   </head>
   <body>
     <h1>Owners.app</h1>
-    <p id="status">Ask someone who actually owns it.</p>
-    <button id="verify">Verify earbuds I own</button>
+    <p class="muted">Ask someone who actually owns it.</p>
+
+    <section id="product-section">
+      <h2>Detected product</h2>
+      <p id="product-title" class="muted">No Amazon earbud product detected yet.</p>
+      <span id="product-verified" class="badge hidden">Verified owner Q&amp;A</span>
+    </section>
+
+    <section id="qa-section">
+      <h2>Owner Q&amp;A</h2>
+      <div id="qa-list"><p class="muted">No verified-owner answers yet — be the first to ask.</p></div>
+    </section>
+
+    <section id="ask-section">
+      <h2>Ask a verified owner</h2>
+      <textarea id="ask-body" placeholder="e.g. Do these stay in during runs? How's the battery after a year?"></textarea>
+      <button id="ask-submit">Ask question</button>
+      <p id="ask-status" class="muted"></p>
+    </section>
+
+    <section id="verify-section">
+      <h2>Own these? Get verified</h2>
+      <p id="verify-copy" class="muted"></p>
+      <button id="verify-start">Verify earbuds I own</button>
+      <div id="verify-preview" class="hidden">
+        <p class="muted">Review the minimal evidence that will be submitted. Nothing is sent until you confirm.</p>
+        <div id="verify-evidence" class="evidence"></div>
+        <button id="verify-confirm">Submit evidence</button>
+        <button id="verify-cancel" class="secondary">Cancel</button>
+      </div>
+      <p id="verify-status" class="muted"></p>
+    </section>
+
+    <section id="handoff-section">
+      <h2>Ready to buy?</h2>
+      <button id="handoff" class="secondary">Continue to Amazon</button>
+      <p id="handoff-disclosure" class="muted"></p>
+    </section>
+
+    <div class="disclosure">
+      <p class="muted" id="v0-disclosure"></p>
+    </div>
+
     <script type="module" src="sidebar.js"></script>
   </body>
 </html>

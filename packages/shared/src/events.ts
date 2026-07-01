@@ -45,3 +45,21 @@ export const ANALYTICS_EVENT_NAMES: readonly AnalyticsEventName[] = [
   "content_reported",
   "commerce_handoff_clicked",
 ] as const;
+
+/** Type guard: whether a raw string is a known v0 analytics event name. */
+export function isAnalyticsEventName(value: string): value is AnalyticsEventName {
+  return (ANALYTICS_EVENT_NAMES as readonly string[]).includes(value);
+}
+
+/** Construct a well-typed analytics event, defaulting `occurredAt` to now. */
+export function createAnalyticsEvent(
+  name: AnalyticsEventName,
+  options: { principalId?: string; props?: AnalyticsEventProps; occurredAt?: string } = {},
+): AnalyticsEvent {
+  return {
+    name,
+    occurredAt: options.occurredAt ?? new Date().toISOString(),
+    ...(options.principalId !== undefined ? { principalId: options.principalId } : {}),
+    ...(options.props !== undefined ? { props: options.props } : {}),
+  };
+}

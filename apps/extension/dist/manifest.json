@@ -2,9 +2,20 @@
   "manifest_version": 3,
   "name": "Owners.app — Verified Owners",
   "version": "0.1.0",
-  "description": "Ask a verified owner on Amazon.com earbud product pages. v0 prototype.",
+  "description": "Ask a verified owner on Amazon.com earbud product pages. v0 prototype (US only).",
   "permissions": ["storage", "scripting", "activeTab"],
-  "host_permissions": ["*://*.amazon.com/*"],
+  "host_permissions": [
+    "*://www.amazon.com/dp/*",
+    "*://www.amazon.com/gp/product/*",
+    "*://www.amazon.com/gp/aw/d/*",
+    "*://www.amazon.com/*/dp/*",
+    "*://www.amazon.com/*/gp/product/*",
+    "*://www.amazon.com/gp/css/order-history*",
+    "*://www.amazon.com/gp/your-account/order-history*",
+    "*://www.amazon.com/gp/css/order-details*",
+    "*://www.amazon.com/your-orders/*"
+  ],
+  "optional_host_permissions": ["http://localhost/*"],
   "action": {
     "default_title": "Owners.app",
     "default_popup": "sidebar/sidebar.html"
@@ -14,7 +25,13 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://www.amazon.com/*", "*://smile.amazon.com/*"],
+      "matches": [
+        "*://www.amazon.com/dp/*",
+        "*://www.amazon.com/gp/product/*",
+        "*://www.amazon.com/gp/aw/d/*",
+        "*://www.amazon.com/*/dp/*",
+        "*://www.amazon.com/*/gp/product/*"
+      ],
       "js": ["content/product.js"],
       "run_at": "document_idle"
     }

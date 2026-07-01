@@ -121,3 +121,47 @@ npm run build:extension# bundle the Chrome MV3 extension to apps/extension/dist
 
 Load the built extension via `chrome://extensions` → Developer mode → *Load unpacked* →
 `apps/extension/dist`.
+
+### Web prototype flows
+
+The web app (`apps/web`) is a runnable, backend-free E2E prototype. It dispatches the same
+JSON contracts (docs/09 §5) against an in-browser in-memory context via
+`apps/web/src/client/localClient.ts`, and boots with demo seed data
+(`apps/web/src/client/seed.ts`). Implemented user-facing flows:
+
+- **Product Q&A** (`/products/:id`) — resolved earbuds product, prior verified-owner Q&A with
+  provenance labels, ask flow, helpful/report actions, and the disclosed no-affiliate
+  "Continue to Amazon" handoff.
+- **Shopper entry** — deep links from the extension via query params (`?asin=…&parentAsin=…`
+  or `?productId=…`) or hash route state (`#/products/:id`); parsed in
+  `apps/web/src/client/navigation.ts`.
+- **Owner flow** — email magic-link-style sign-in stub (pseudonymous handles), Amazon Orders
+  verification with evidence preview/consent, and a recognition-only dashboard (verified
+  products, routed questions, helpful/answered/top-helper — no cash earnings).
+- **Answer flow** — verified owners answer owned-product questions; pending/wrong-product
+  states surface a clear `OWNERSHIP_REQUIRED` error.
+- **Admin** (`/admin`) — product merge queue, verification approve/reject, moderation
+  hide/restore, and a metrics summary.
+
+UI component/flow tests live alongside the code (`*.test.ts[x]`, run under Vitest +
+happy-dom + Testing Library).
+
+### Cross-component integration & E2E tests
+
+Deterministic, backend-free integration/E2E tests live under `tests/` and wire the *real*
+components together across workspace boundaries (via `tests/support/harness.ts`): the
+extension `OwnersApiClient` transport and the web `LocalApiClient` both dispatch through the
+real router/handlers against one shared in-memory context. They cover every touchpoint:
+
+- `tests/integration/shared-to-web-api.test.ts` — shared normalization/resolution, evidence
+  evaluation (verified vs. pending), and the answer-authorization invariant.
+- `tests/integration/extension-to-web-api.test.ts` — PDP detection → resolve, Orders-scan
+  evidence → claim, and the no-affiliate handoff/analytics posture.
+- `tests/integration/web-ui-flow.test.ts` — ask → answer → helpful → report → moderation →
+  metrics via the client the UI uses.
+- `tests/e2e/happy-path.test.ts` — full funnel: detect → resolve → verify → ask → answer →
+  helpful → handoff → admin metrics.
+- `tests/e2e/edge-cases.test.ts` — pending/wrong-product owners cannot answer; only hashed,
+  minimized evidence is persisted (no raw order id/address/price/payment); provisional
+  products route to the admin merge/review queues.
+
